@@ -95,12 +95,12 @@ class Function():
                     body.append(stmt_generator.basicblock_inst(self._bb_idx, indent=indent)) 
                     self._bb_idx += 1   # 因此需要插入标记
                     isNewBB = False # 普通stmt的下一句不会开启新基本块，因此设置标记为F
-                stmt, new_local = stmt_generator.random_stmt(local_out_bb + local_in_bb, 
+                stmt, new_local, new_local_tp = stmt_generator.random_stmt(local_out_bb + local_in_bb, 
                                                              indent, 
                                                              max_depth=self._max_expr_complexity, 
                                                              min_depth=self._min_expr_complexity)
                 if new_local != None:
-                    local_in_bb.append(new_local)
+                    local_in_bb.append((new_local, new_local_tp))
                 body.append(stmt)
             _break = random.choice([True, False])    
             if _break and i >= self._max_block_size:
@@ -108,15 +108,16 @@ class Function():
         # body.append(utils._basicblock_inst(self._bb_idx, indent=indent))
         return body
         
-    def make_function(self, arg_count, funcname, stmt_generator:Statement):
+    def make_function(self, arg_count, ret_type, funcname, stmt_generator:Statement):
         local_vars = []
 
         # prelog
-        head = C.function(funcname, 'int')
+        head = C.function(funcname, ret_type)
         for i in range(arg_count):
             p_var = f"p{i}"
-            head.add_param(C.variable(p_var, 'int'))
-            local_vars.append(p_var)
+            tp = random.choice(stmt_generator._types)
+            head.add_param(C.variable(p_var, tp))
+            local_vars.append((p_var, tp))
         
         # local var
         local_var_cnt = random.randint(self._min_local_variables, self._max_local_variables)
@@ -126,12 +127,14 @@ class Function():
         for i in range(local_var_cnt):
             var = f"v{i}"
             inst = f"f_rand_{i}"
-            defs_list.append(stmt_generator.var_defination_stmt(var, inst))
-            local_vars.append(var)
+            tp = random.choice(stmt_generator._types)
+            defs_list.append(stmt_generator.var_defination_stmt(var, tp, inst))
+            local_vars.append((var, tp))
         for i in range(local_const_cnt):
             var = f"v{i + local_var_cnt}"
-            defs_list.append(stmt_generator.const_defination_stmt(var))
-            local_vars.append(var)
+            tp = random.choice(stmt_generator._types)
+            defs_list.append(stmt_generator.const_defination_stmt(var, tp))
+            local_vars.append((var, tp))
         random.shuffle(defs_list)
         for def_stmt in defs_list:
             func_body.append(def_stmt)
@@ -147,7 +150,7 @@ class Function():
         # insert ret stmt
 
         func_body.append(stmt_generator.basicblock_inst(self._bb_idx, indent=2))
-        func_body.append(stmt_generator.ret_var_stmt(local_vars, indent=2, max_depth=self._max_expr_complexity))
+        func_body.append(stmt_generator.ret_var_stmt(local_vars, indent=2, max_depth=self._max_expr_complexity, ret_type=ret_type))
         func_body.append(stmt_generator.ret_stmt(indent=2))
         
         # make function
@@ -182,19 +185,23 @@ class Function():
             var = f"v{i}"
             local_vars.append(var)
             assignConst = random.choice([True, False])
+            tp = random.choice(stmt_generator._types)
             if assignConst:
-                body.append(stmt_generator.const_defination_stmt(var))
+                body.append(stmt_generator.const_defination_stmt(var, tp))
             else:
                 inst = f"f_rand_{i}"
-                body.append(stmt_generator.var_defination_stmt(var, inst))
+                body.append(stmt_generator.var_defination_stmt(var, tp, inst))
         
         var_idx = self._max_args
-        for func, nargs in callees:
+        for func, nargs, ret_type in callees:
             args = random.choices(local_vars, k=nargs)
             var = f"v{var_idx}"
-            stmt = stmt_generator.nonvoid_call_stmt(var, func, args, 2)
+            stmt = stmt_generator.nonvoid_call_stmt(var, func, args, 2, ret_type=ret_type)
             body.append(stmt)
-            stmt = stmt_generator.void_call_stmt('printf', ['"%d"', var], 2)
+            fmt = "%d"
+            if ret_type == 'double' or ret_type == 'float':
+                fmt = "%f"
+            stmt = stmt_generator.void_call_stmt('printf', [f'"{fmt}"', var], 2)
             body.append(stmt)
 
             local_vars.append(var)

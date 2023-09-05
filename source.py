@@ -21,6 +21,8 @@ def make_src_file(max_funcs,
                   max_const_values,
                   has_divs,
                   has_logic,
+                  has_float=False,
+                  has_double=False,
                   filename='out.c'):
     f = C.cfile(filename)
     f.code.append(C.sysinclude('stdlib.h'))
@@ -40,7 +42,7 @@ def make_src_file(max_funcs,
                               max_block_depth,
                               max_branch,
                               max_funcs)
-    stmt_generator = Statement(has_logic, has_divs, max_const_values)
+    stmt_generator = Statement(has_logic, has_divs, has_float, has_double, max_const_values)
     
     for i in range(max(max_local_variables, max_args)):
         f.code.append(func_generator.input_inst_declare(i))
@@ -50,8 +52,9 @@ def make_src_file(max_funcs,
     for i in range(max_funcs):
         funcname = f"func{i}"
         nargs = random.randint(0, max_args)
-        nfuncs.append((funcname, nargs))
-        f.code.append(func_generator.make_function(nargs, funcname, stmt_generator))
+        ret_type = random.choice(stmt_generator._types)
+        nfuncs.append((funcname, nargs, ret_type))
+        f.code.append(func_generator.make_function(nargs, ret_type, funcname, stmt_generator))
         f.code.append(C.blank())
         
     f.code.append(func_generator.make_main(nfuncs, stmt_generator))
@@ -115,6 +118,14 @@ if __name__ == '__main__':
                         help='enable/disable logic operation')
     parser.add_argument('--no-logic', dest='logic', action='store_false')
     
+    parser.add_argument('--float', default=True,
+                        action='store_true',
+                        help='enable/disable float')
+    parser.add_argument('--no-float', dest='float', action='store_false')
+    parser.add_argument('--double', default=True,
+                        action='store_true',
+                        help='enable/disable double operation')
+    parser.add_argument('--no-double', dest='double', action='store_false')
     parser.add_argument('-o', '--out', type=str, help="specify the output file name.")
     parser.add_argument('-d', '--debug', choices=['True', 'False'], default=False)
 
@@ -139,6 +150,8 @@ if __name__ == '__main__':
                          args.max_const_values,
                          args.divs,
                          args.logic,
+                         args.float,
+                         args.double,
                          output_file)
     output_to_file(output_file, func)
     if args.debug == 'True':
