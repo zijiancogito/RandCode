@@ -1,20 +1,22 @@
 import sys
-
 import cfile as C
 import random
 
 import copy
 
-
-
 class Statement():
-    def __init__(self, haslogic=True, hasdivs=True, max_const_values=1000) -> None:
+    def __init__(self, haslogic=True, hasdivs=True, max_const_values=1000, hasfloat=False, hasdouble=False) -> None:
         self._cond_operators = ['>', '>=', '<', '<=', '!=', '==']
         self._operators = ['+', '-', '*'] 
+        self._types = ['int']
         if haslogic:
             self._operators.extend(['&', '^', '|', '~']) 
         if hasdivs:
             self._operators.extend(['/', '%'])
+        if hasfloat:
+            self._types.append('float')
+        if hasdouble:
+            self._types.append('double')
         self._max_const_values = max_const_values
         
     def is_binary(self, operator):
@@ -23,15 +25,20 @@ class Statement():
         return True
 
     def var_defination_stmt(self, var, func):
-        def_stmt = C.statement(f"{C.variable(var, 'int')} = {C.fcall(func)}")
+        tp = random.choice(self._types)
+        def_stmt = C.statement(f"{C.variable(var, tp)} = ({tp})({C.fcall(func)})")
         return def_stmt
 
     def const_defination_stmt(self, var):
-        def_stmt = C.statement(f"{C.variable(var, 'int')} = {random.randint(1, self._max_const_values)}")
+        tp = random.choice(self._types)
+        def_stmt = C.statement(f"{C.variable(var, tp)} = ({tp})({random.randint(1, self._max_const_values)})")
         return def_stmt
 
-    def basicblock_inst(self, bb_index, indent):
-        inst_stmt = C.statement(C.fcall('printf', ['"BB: %d"', bb_index]), indent=indent)
+    def basicblock_inst(self, bb_index, indent, var_type='int'):
+        fmt = '%d'
+        if var_type == 'float' or var_type == 'double':
+            fmt = '%f'
+        inst_stmt = C.statement(C.fcall('printf', [f'"BB: {fmt}"', bb_index]), indent=indent)
         return inst_stmt
 
     def random_stmt(self, source:list, indent, max_depth=1, min_depth=1):
@@ -60,7 +67,8 @@ class Statement():
         if new_local_var:
             new_var = f"v{len(source)}"
             # source.append(new_var)
-            stmt = C.statement(f"{C.variable(new_var, 'int')} = {expr}", indent=indent)
+            tp = random.choice(self._types)
+            stmt = C.statement(f"{C.variable(new_var, tp)} = ({tp})({expr})", indent=indent)
         else:
             dest_var = random.choice(source)
             stmt = C.statement(f"{dest_var} = {expr}", indent=indent)
@@ -77,11 +85,11 @@ class Statement():
         if var_2_tp == 0:   # var
             var_2 = random.choice(local_vars_bp)
             operator = random.choice(self._cond_operators)
-            exp = f"{var_1} {operator} {var_2}"
+            exp = f"(int)({var_1}) {operator} (int)({var_2})"
         elif var_2_tp == 1:    # const
             var_2 = random.randint(1, self._max_const_values)
             operator = random.choice(self._cond_operators)
-            exp = f"{var_1} {operator} {var_2}"
+            exp = f"(int)({var_1}) {operator} (int)({var_2})"
         stmt = C.line(f"while({exp})", indent)
         return stmt
 
@@ -96,11 +104,11 @@ class Statement():
         if var_2_tp == 0:   # var
             var_2 = random.choice(local_vars_bp)
             operator = random.choice(self._cond_operators)
-            exp = f"{var_1} {operator} {var_2}"
+            exp = f"(int)({var_1}) {operator} (int)({var_2})"
         elif var_2_tp == 1:    # const
             var_2 = random.randint(1, self._max_const_values)
             operator = random.choice(self._cond_operators)
-            exp = f"{var_1} {operator} {var_2}"
+            exp = f"(int)({var_1}) {operator} (int)({var_2})"
         stmt = C.line(f"if({exp})", indent=indent)
         return stmt
 
@@ -108,7 +116,7 @@ class Statement():
         stmt = C.line("else", indent=indent)
         return stmt
 
-    def ret_var_stmt(self, source:list, indent, max_depth, min_depth=1):
+    def ret_var_stmt(self, source:list, indent, max_depth, min_depth=1, ret_type='int'):
         expr  = random.choice(source)
         expr_is_var = True
         for it in range(max_depth):
@@ -129,7 +137,7 @@ class Statement():
                 else:
                     expr = f"{opc} ({expr})"
         ret_var = "ret"
-        stmt = C.statement(f"{C.variable(ret_var, 'int')} = {expr}", indent=indent)
+        stmt = C.statement(f"{C.variable(ret_var, ret_type)} = ({ret_type})({expr})", indent=indent)
         return stmt
 
     def ret_stmt(self, indent):
@@ -140,8 +148,8 @@ class Statement():
         exp = C.fcall(func , args)
         return exp
 
-    def nonvoid_call_stmt(self, var, func, args:list, indent):
-        stmt = C.statement(f"{C.variable(var, 'int')} = {self.call_expr(func, args)}", indent)
+    def nonvoid_call_stmt(self, var, func, args:list, indent, ret_type='int'):
+        stmt = C.statement(f"{C.variable(var, ret_type)} = {self.call_expr(func, args)}", indent)
         return stmt
 
     def void_call_stmt(self, func, args:list, indent):
