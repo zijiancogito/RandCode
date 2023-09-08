@@ -147,7 +147,7 @@ class Statement():
                         expr = f"({var[1]})({expr}) {opc} {var[0]}"
                 else:
                     if opc in self._non_float:
-                        expr = f"{opc} {var[0]}"
+                        expr = f"{opc} ((int){var[0]})"
                     else:
                         expr = f"{opc} {var[0]}"
                 expr_is_var = False
