@@ -1,0 +1,79 @@
+Determining if the include file bsd/stdlib.h exists failed with the following output:
+Change Dir: /home/caoy/repo/csmith/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4f898/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4f898.dir/build.make CMakeFiles/cmTC_4f898.dir/build
+gmake[1]: 进入目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_4f898.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4f898.dir/CheckIncludeFile.c.o -c /home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: bsd/stdlib.h: 没有那个文件或目录
+    1 | #include <bsd/stdlib.h>
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_4f898.dir/build.make:78：CMakeFiles/cmTC_4f898.dir/CheckIncludeFile.c.o] 错误 1
+gmake[1]: 离开目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+gmake: *** [Makefile:127：cmTC_4f898/fast] 错误 2
+
+
+
+Determining if the arc4random_buf exist failed with the following output:
+Change Dir: /home/caoy/repo/csmith/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_7e13d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7e13d.dir/build.make CMakeFiles/cmTC_7e13d.dir/build
+gmake[1]: 进入目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_7e13d.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_7e13d.dir/CheckSymbolExists.c.o -c /home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c: In function ‘main’:
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: ‘arc4random_buf’ undeclared (first use in this function)
+    8 |   return ((int*)(&arc4random_buf))[argc];
+      |                   ^~~~~~~~~~~~~~
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+gmake[1]: *** [CMakeFiles/cmTC_7e13d.dir/build.make:78：CMakeFiles/cmTC_7e13d.dir/CheckSymbolExists.c.o] 错误 1
+gmake[1]: 离开目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+gmake: *** [Makefile:127：cmTC_7e13d/fast] 错误 2
+
+
+File /home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef arc4random_buf
+  return ((int*)(&arc4random_buf))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the srand48_deterministic exist failed with the following output:
+Change Dir: /home/caoy/repo/csmith/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d4475/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d4475.dir/build.make CMakeFiles/cmTC_d4475.dir/build
+gmake[1]: 进入目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_d4475.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_d4475.dir/CheckSymbolExists.c.o -c /home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c: In function ‘main’:
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: ‘srand48_deterministic’ undeclared (first use in this function)
+    8 |   return ((int*)(&srand48_deterministic))[argc];
+      |                   ^~~~~~~~~~~~~~~~~~~~~
+/home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+gmake[1]: *** [CMakeFiles/cmTC_d4475.dir/build.make:78：CMakeFiles/cmTC_d4475.dir/CheckSymbolExists.c.o] 错误 1
+gmake[1]: 离开目录“/home/caoy/repo/csmith/CMakeFiles/CMakeTmp”
+gmake: *** [Makefile:127：cmTC_d4475/fast] 错误 2
+
+
+File /home/caoy/repo/csmith/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef srand48_deterministic
+  return ((int*)(&srand48_deterministic))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
