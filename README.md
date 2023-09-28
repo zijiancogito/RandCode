@@ -1,4 +1,4 @@
-# DSmith
+# Code Generator
 
 A random generator of C programs like CSmith. It's primary purpose is to find decompiler errors with random programs.
 
